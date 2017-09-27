@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">BeginPDM</string>
+    <string name="app_name" translatable="false">BeginPDM</string>
+    <string name="greeting">Hello World!</string>
+    <string name="do_something">Do something!</string>
 </resources>
