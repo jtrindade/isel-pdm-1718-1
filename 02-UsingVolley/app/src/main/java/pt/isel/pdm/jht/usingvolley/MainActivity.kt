@@ -13,6 +13,10 @@ import org.json.JSONObject
 
 class MainActivity : AppCompatActivity() {
 
+    data class Prof(val number: Int, val name: String) {
+        override fun toString(): String = name
+    }
+
     private val TEACHERS_URI = "https://adeetc.thothapp.com/api/v1/teachers"
 
     private val lstProfs by lazy { findViewById(R.id.lstProfs) as ListView }
@@ -29,7 +33,12 @@ class MainActivity : AppCompatActivity() {
 
                     val teachers = jsonTeachers
                                         .asSequence()
-                                        .map { it.getString("shortName") ?: "---" }
+                                        .map {
+                                            Prof(
+                                                it["number"] as Int,
+                                                it["shortName"] as String
+                                            )
+                                        }
                                         .toList()
                                         .toTypedArray()
 
@@ -38,7 +47,7 @@ class MainActivity : AppCompatActivity() {
                     lstProfs.adapter = adapter
 
                     lstProfs.setOnItemClickListener { parent, view, position, id ->
-                        Toast.makeText(this, teachers[position], Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, teachers[position].number.toString(), Toast.LENGTH_SHORT).show()
                     }
                 },
                 {
