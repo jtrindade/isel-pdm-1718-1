@@ -6,11 +6,10 @@
     android:layout_height="match_parent"
     tools:context="pt.isel.pdm.jht.usingvolley.MainActivity">
 
-    <TextView
-        android:id="@+id/txtBox"
+    <ListView
+        android:id="@+id/lstProfs"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="..."
         />
 
 </RelativeLayout>
