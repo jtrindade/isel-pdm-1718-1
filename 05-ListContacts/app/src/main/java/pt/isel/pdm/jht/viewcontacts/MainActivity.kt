@@ -1,6 +1,7 @@
 package pt.isel.pdm.jht.viewcontacts
 
 import android.Manifest
+import android.app.ListActivity
 import android.app.LoaderManager
 import android.content.CursorLoader
 import android.content.Loader
@@ -11,23 +12,32 @@ import android.provider.ContactsContract
 import android.widget.TextView
 import android.content.pm.PackageManager
 import android.support.v4.content.ContextCompat
+import android.widget.SimpleCursorAdapter
 import android.widget.Toast
 
 
-class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> {
+class MainActivity : ListActivity(), LoaderManager.LoaderCallbacks<Cursor> {
 
     private val CONTACTS_LOADER = 88
 
-    private val txtBox by lazy { findViewById(R.id.txtBox) as TextView }
+    val adapter by lazy {
+        val from = arrayOf(ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts.LOOKUP_KEY)
+        val to = intArrayOf(android.R.id.text1, android.R.id.text2)
+
+        SimpleCursorAdapter(this, android.R.layout.simple_list_item_2, null, from, to, 0)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        listView.adapter = adapter
+
         Toast.makeText(this, "Create", Toast.LENGTH_LONG).show()
+
         if (hasPermissionToReadContacts())
             loaderManager.initLoader(CONTACTS_LOADER, null, this)
         else
-            txtBox.text = "[NO PERMISSION TO READ CONTACTS]"
+            Toast.makeText(this, "[NO PERMISSION TO READ CONTACTS]", Toast.LENGTH_LONG).show()
     }
 
     private fun hasPermissionToReadContacts() =
@@ -55,29 +65,11 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
 
     override fun onLoadFinished(loader: Loader<Cursor>?, data: Cursor?) {
         Toast.makeText(this, "Load Finished", Toast.LENGTH_LONG).show();
-        if (data != null) {
-            showContacts(data)
-        }
+        adapter.changeCursor(data)
     }
 
     override fun onLoaderReset(loader: Loader<Cursor>?) {
         Toast.makeText(this, "Loader Reset", Toast.LENGTH_LONG).show();
-        txtBox.text = "[NO CONTACTS]"
-    }
-
-    private fun showContacts(contactsCursor: Cursor) {
-        if (contactsCursor.count > 0) {
-            val idxName = contactsCursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
-            val idxKey = contactsCursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)
-            txtBox.text = ""
-            contactsCursor.moveToFirst()
-            do {
-                val name = contactsCursor.getString(idxName)
-                val key = contactsCursor.getString(idxKey)
-                txtBox.append("$name   [$key]\n")
-            } while (contactsCursor.moveToNext())
-        } else {
-            txtBox.text = "[NO CONTACTS]"
-        }
+        adapter.changeCursor(null)
     }
 }
